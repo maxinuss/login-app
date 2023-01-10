@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  node-login-back:
+    build: docker/node
+    tty: true
+    command: bash -c "npm i && npm start"
+    container_name: node-login-back-container
+    volumes:
+      - ./backend:/www
+    ports:
+      - "3503:3000"
+    networks:
+      - node-login-network
+
+  db-login:
+    image: postgres:15.1
+    container_name: postgres-login-container
+    ports:
+      - "5473:5432"
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: root
+      POSTGRES_DB: login_task
+    volumes:
+      - postgres-login-vol:/var/lib/postgresql/data
+    networks:
+      - node-login-network
+
+  node-login-front:
+    build: docker/node
+    tty: true
+    command: bash -c "npm i && npm start"
+    container_name: node-login-front-container
+    volumes:
+      - ./frontend:/www
+    ports:
+      - "4403:4403"
+    networks:
+      - node-login-network
+
+volumes:
+  node_modules:
+  postgres-login-vol:
+  data:
+    driver: "local"
+networks:
+  node-login-network:
+    name: node-login-network
+    driver: bridge
